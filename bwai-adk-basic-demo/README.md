@@ -58,8 +58,11 @@ The retrieval layer has **no external dependencies** (no vector DB, no embedding
 ## Prerequisites
 
 - **Python 3.10+** — ADK is a Python framework. Check with `python --version`.
-- **A Google AI Studio API key or a configured Vertex AI project** — the agent's "brain" is a Gemini model running on Google's servers. An [AI Studio](https://aistudio.google.com/) key is fastest for a workshop; Vertex AI is the alternative if you already use Google Cloud.
+- **An OpenRouter API key** — powers the tutor agent. Get one at [openrouter.ai/keys](https://openrouter.ai/keys). Routing the tutor through OpenRouter avoids the Google free tier's 5-requests-per-minute limit.
+- **A Google AI Studio API key** — powers the live web-search sub-agent, because the built-in `google_search` grounding tool only works on the native Google API. Get one at [aistudio.google.com](https://aistudio.google.com/).
 - **Git**.
+
+> **Why two keys?** This is a hybrid setup. The tutor (most of the requests) runs on OpenRouter's `google/gemini-3.5-flash`; the web-search sub-agent stays on the native Gemini API so `google_search` keeps working. Both are set in the model section of [`tutor_agent/agent.py`](tutor_agent/agent.py).
 
 ## Setup
 
@@ -99,7 +102,7 @@ The retrieval layer has **no external dependencies** (no vector DB, no embedding
    cp .env.example .env
    ```
 
-   Then edit `.env` and provide either your Google AI Studio API key or your Vertex AI project settings. `.env` is git-ignored — never commit it.
+   Then edit `.env` and set both `OPENROUTER_API_KEY` and `GOOGLE_API_KEY`. `.env` is git-ignored — never commit it.
 
 ## Run the agent
 

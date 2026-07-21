@@ -52,13 +52,13 @@ somewhere other than `http://127.0.0.1:8000`, set `ADK_URL` before `npm run dev`
 - The **rail** updates live from session state: filed sources and per-concept
   mastery meters (the weakest concept is flagged "next to review").
 
-## A note on the free Gemini tier
+## Rate limits
 
-The free tier allows only **5 model requests per minute**. A single quiz-and-grade
-exchange makes several requests (one per tool round-trip), so you can hit a
-`429 RESOURCE_EXHAUSTED` mid-turn. The UI surfaces this as a friendly message —
-wait about a minute and continue, or enable billing on your Google AI Studio key
-for smooth use.
+The tutor runs on OpenRouter (pay-per-use, high limits), so the main
+teaching/quiz/grade loop no longer hits the Google free-tier cap. The web-search
+sub-agent still uses the native Google API, so a burst of web lookups could in
+theory hit Google's free `429 RESOURCE_EXHAUSTED` — the UI surfaces this as a
+friendly "wait a minute" message. Web searches are infrequent, so this is rare.
 
 ## How it connects
 

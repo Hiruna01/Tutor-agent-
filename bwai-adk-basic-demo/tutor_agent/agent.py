@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import dotenv
 from google.adk.agents import Agent
+from google.adk.models.lite_llm import LiteLlm
 from google.adk.tools import google_search
 from google.adk.tools.agent_tool import AgentTool
 
@@ -34,11 +35,17 @@ from .tools import (
 
 dotenv.load_dotenv()
 
-# One place to swap the model. `gemini-flash-latest` is an alias that always
-# resolves to the current Gemini flash model, so this demo won't break when a
-# specific version is retired. It's a Gemini 2+ model, so `google_search`
-# grounding works in the search sub-agent.
-MODEL = "gemini-flash-latest"
+# ── Models (hybrid) ───────────────────────────────────────────────────────────
+# The tutor runs on OpenRouter (via ADK's LiteLLM integration) to escape the
+# Google free-tier rate limit — the teaching/quiz/grading loop is where most
+# requests happen. Needs OPENROUTER_API_KEY in the environment.
+TUTOR_MODEL = LiteLlm(model="openrouter/google/gemini-3.5-flash")
+
+# The search sub-agent stays on the NATIVE Google API: the built-in
+# `google_search` grounding tool only works there, not through OpenRouter.
+# `gemini-flash-latest` is an alias that tracks the current Gemini flash model,
+# so this won't break when a version is retired. Needs GOOGLE_API_KEY.
+SEARCH_MODEL = "gemini-flash-latest"
 
 # ── Search sub-agent ──────────────────────────────────────────────────────────
 # ADK's built-in `google_search` tool cannot be mixed with other tools in the
@@ -48,7 +55,7 @@ MODEL = "gemini-flash-latest"
 # search the live web.
 search_agent = Agent(
     name="search_agent",
-    model=MODEL,
+    model=SEARCH_MODEL,
     description="Runs live Google Search and returns current, cited web findings.",
     instruction="""
 You are a web research specialist. You are given a single, focused query about
@@ -66,7 +73,7 @@ search returns nothing useful, say so plainly.
 # ── Tutor orchestrator (root) ─────────────────────────────────────────────────
 root_agent = Agent(
     name="tutor_agent",
-    model=MODEL,
+    model=TUTOR_MODEL,
     description=(
         "An interactive study tutor that teaches from the student's own uploaded "
         "notes, falls back to live web search when needed, and runs quizzes with "

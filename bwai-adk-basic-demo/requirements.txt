@@ -1,2 +1,4 @@
 google-adk==2.5.0
 python-dotenv==1.0.1
+# Enables the OpenRouter (LiteLLM) model for the tutor agent.
+litellm==1.91.4
