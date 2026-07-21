@@ -22,6 +22,7 @@ from google.adk.agents import Agent
 from google.adk.models.lite_llm import LiteLlm
 from google.adk.tools import google_search
 from google.adk.tools.agent_tool import AgentTool
+from google.genai import types
 
 from .tools import (
     get_grading_reference,
@@ -39,7 +40,13 @@ dotenv.load_dotenv()
 # The tutor runs on OpenRouter (via ADK's LiteLLM integration) to escape the
 # Google free-tier rate limit — the teaching/quiz/grading loop is where most
 # requests happen. Needs OPENROUTER_API_KEY in the environment.
-TUTOR_MODEL = LiteLlm(model="openrouter/google/gemini-3.5-flash")
+TUTOR_MODEL = LiteLlm(model="openrouter/google/gemini-3.1-flash-lite")
+
+# Cap the response length. OpenRouter reserves account credit up front based on
+# max_tokens, and the model default (65536) reserves so much that a small
+# balance is rejected with "requires more credits, or fewer max_tokens". A few
+# thousand tokens is plenty for a tutor turn and keeps the reservation tiny.
+TUTOR_CONFIG = types.GenerateContentConfig(max_output_tokens=2048)
 
 # The search sub-agent stays on the NATIVE Google API: the built-in
 # `google_search` grounding tool only works there, not through OpenRouter.
@@ -74,6 +81,7 @@ search returns nothing useful, say so plainly.
 root_agent = Agent(
     name="tutor_agent",
     model=TUTOR_MODEL,
+    generate_content_config=TUTOR_CONFIG,
     description=(
         "An interactive study tutor that teaches from the student's own uploaded "
         "notes, falls back to live web search when needed, and runs quizzes with "
