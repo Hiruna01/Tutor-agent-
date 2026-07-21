@@ -111,6 +111,16 @@ adk web
 
 This starts a local web server and a browser chat UI. Open the printed URL (e.g. `http://localhost:8000`) and select **`tutor_agent`**. Stop the server anytime with `Ctrl+C`.
 
+## Custom web UI
+
+Beyond the stock `adk web` dev UI, this repo ships a hand-built React front end in
+[`frontend/`](frontend/) — a "study desk" interface where color is semantic
+(ochre = your notes, teal = live web), every tutor reply carries a source margin,
+and a live rail shows your filed materials and concept-mastery meters read from
+session state. It talks to the ADK API server over `/run_sse`. See
+[frontend/README.md](frontend/README.md) for the two-server run guide (note the
+required `--allow_origins` flag).
+
 ## Try it
 
 Paste some notes, then walk the full loop:

@@ -102,6 +102,7 @@ export default function App() {
       ])
 
       let acc = ''
+      let streamError = null
       const seenTools = new Set()
 
       try {
@@ -110,6 +111,15 @@ export default function App() {
           sessionId,
           parts,
           onEvent: (ev) => {
+            // ADK reports model/tool failures as in-stream error events rather
+            // than an HTTP error, so catch them here or they vanish silently.
+            const errMsg = ev.errorMessage || ev.error
+            if (errMsg) {
+              streamError = /RESOURCE_EXHAUSTED|429/.test(errMsg)
+                ? 'The free Gemini tier allows only 5 requests a minute, and this study step used several. Give it about a minute, then try again.'
+                : 'The tutor hit a snag: ' + String(errMsg).split('\n')[0].slice(0, 160)
+              return
+            }
             const content = ev.content
             if (!content?.parts) return
             for (const part of content.parts) {
@@ -145,9 +155,11 @@ export default function App() {
           },
         })
       } catch (e) {
-        setError(e.message)
-        acc = acc || '⚠️ ' + e.message
+        streamError = e.message
       }
+
+      if (streamError) setError(streamError)
+      if (!acc && streamError) acc = '⚠️ ' + streamError
 
       patchLast((m) => ({
         text: acc,
