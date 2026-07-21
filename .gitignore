@@ -1,0 +1,26 @@
+# This repo's actual root is one level above the tracked project
+# (bwai-adk-basic-demo/). These patterns catch local runtime/build
+# artifacts anywhere under here so they can't get committed again.
+
+# Google ADK local session/runtime state
+.adk/
+*.db
+*.db-shm
+*.db-wal
+
+# Python
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+
+# Node
+node_modules/
+dist/
+
+# Editors and OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
