@@ -7,9 +7,10 @@ builder = "NIXPACKS"
 buildCommand = "pip install -r requirements.txt"
 
 [deploy]
-# $PORT is injected by Railway. $ALLOW_ORIGINS is a variable you set in the
-# dashboard so CORS can change without editing this file. The trailing "."
-# tells ADK to scan this directory for agents (finds tutor_agent/).
-startCommand = "adk api_server --host 0.0.0.0 --port $PORT --allow_origins \"$ALLOW_ORIGINS\" ."
+# $PORT is injected by Railway. The Vercel origin is hardcoded here (instead of
+# read from a dashboard variable) so CORS can't silently break if the variable
+# is unset or not shell-expanded. Change it if your Vercel domain changes.
+# The trailing "." tells ADK to scan this directory for agents (finds tutor_agent/).
+startCommand = "adk api_server --host 0.0.0.0 --port $PORT --allow_origins https://tutor-agent-u67l.vercel.app ."
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3
