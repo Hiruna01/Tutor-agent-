@@ -1,0 +1,30 @@
+# Render Blueprint for the TutorAgent ADK backend.
+# Deploy: Render dashboard -> New + -> Blueprint -> pick this repo.
+# Then set the one secret it can't read from here: GOOGLE_API_KEY.
+#
+# The frontend (on Vercel) must set VITE_ADK_URL to this service's URL
+# (e.g. https://tutor-agent-backend.onrender.com) and be redeployed.
+services:
+  - type: web
+    name: tutor-agent-backend
+    runtime: python
+    plan: free
+    # The git repo root is the parent folder; the ADK project lives here.
+    rootDir: bwai-adk-basic-demo
+    buildCommand: pip install -r requirements.txt
+    # $PORT is provided by Render. $ALLOW_ORIGINS is set below so CORS can be
+    # changed without editing this file. The trailing "." tells ADK to scan
+    # this directory for agents (finds tutor_agent/).
+    startCommand: adk api_server --host 0.0.0.0 --port $PORT --allow_origins "$ALLOW_ORIGINS" .
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12"
+      - key: GOOGLE_GENAI_USE_VERTEXAI
+        value: "FALSE"
+      # The browser origin allowed to call this backend (your Vercel URL).
+      # Change this if your Vercel domain changes.
+      - key: ALLOW_ORIGINS
+        value: https://tutor-agent-u67l.vercel.app
+      # Secret — do NOT hardcode. Set it in the Render dashboard.
+      - key: GOOGLE_API_KEY
+        sync: false

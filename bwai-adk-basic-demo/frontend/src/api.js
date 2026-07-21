@@ -1,6 +1,12 @@
 // Thin client for the Google ADK API server (`adk api_server`).
 // Endpoints and camelCase body shape verified against google-adk 2.5.0.
 
+// Base URL of the hosted ADK backend. In local dev this stays empty and the
+// Vite proxy (see vite.config.js) forwards relative paths to localhost:8000.
+// In production set VITE_ADK_URL to your deployed backend, e.g.
+// https://tutor-agent-backend.onrender.com  (no trailing slash).
+const BASE = (import.meta.env.VITE_ADK_URL || '').replace(/\/$/, '')
+
 export const APP_NAME = 'tutor_agent'
 
 // The root agent's name — only text authored by it becomes message body;
@@ -18,7 +24,7 @@ export function getUserId() {
 }
 
 export async function createSession(userId) {
-  const res = await fetch(`/apps/${APP_NAME}/users/${userId}/sessions`, {
+  const res = await fetch(`${BASE}/apps/${APP_NAME}/users/${userId}/sessions`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({}),
@@ -30,7 +36,7 @@ export async function createSession(userId) {
 
 export async function getSession(userId, sessionId) {
   const res = await fetch(
-    `/apps/${APP_NAME}/users/${userId}/sessions/${sessionId}`
+    `${BASE}/apps/${APP_NAME}/users/${userId}/sessions/${sessionId}`
   )
   if (!res.ok) throw new Error(`Could not load session (${res.status})`)
   return res.json()
@@ -63,7 +69,7 @@ export async function fileToPart(file) {
 // POST /run_sse and parse the Server-Sent-Events stream. `onEvent` receives
 // each decoded ADK Event object as it arrives.
 export async function runSSE({ userId, sessionId, parts, onEvent, signal }) {
-  const res = await fetch('/run_sse', {
+  const res = await fetch(`${BASE}/run_sse`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     signal,
