@@ -1,25 +1,37 @@
-# This repo's actual root is one level above the tracked project
-# (bwai-adk-basic-demo/). These patterns catch local runtime/build
-# artifacts anywhere under here so they can't get committed again.
+# Credentials and local configuration
+.env
+.env.*
+!.env.example
 
-# Google ADK local session/runtime state
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Python-generated files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Test, lint, type-check, and coverage output
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Build output
+build/
+dist/
+*.egg-info/
+
+# Google ADK local state
 .adk/
 *.db
 *.db-shm
 *.db-wal
 
-# Python
-.venv/
-venv/
-env/
-__pycache__/
-*.py[cod]
-
-# Node
-node_modules/
-dist/
-
-# Editors and OS
+# Editors and operating systems
 .idea/
 .vscode/
 .DS_Store
